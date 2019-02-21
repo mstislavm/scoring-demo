@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" id="Definitions_1g6ktyu" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="2.2.3">
+  <bpmn:collaboration id="Collaboration_1cvv24w">
+    <bpmn:participant id="Participant_1a7r1gf" name="Scoring" processRef="vtb" />
+    <bpmn:participant id="Participant_1ce56i7" name="CreditRegistry SOAP WebService" />
+    <bpmn:messageFlow id="MessageFlow_0wwkffc" sourceRef="Task_15jmpdp" targetRef="Participant_1ce56i7" />
+    <bpmn:messageFlow id="MessageFlow_07hvsjo" sourceRef="Participant_1ce56i7" targetRef="Task_15jmpdp" />
+  </bpmn:collaboration>
+  <bpmn:process id="vtb" name="Scoring" isExecutable="true">
+    <bpmn:exclusiveGateway id="ExclusiveGateway_0t2j6ir" name="Нужен вызов SC2?" default="SequenceFlow_04khreh">
+      <bpmn:incoming>SequenceFlow_0jphxp7</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1girng6</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_04khreh</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="Task_1ddvemc" name="Запрос к источнику JDBC" camunda:class="com.reunico.bpm.vtb.JdbcDelegate">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="columns">*</camunda:inputParameter>
+          <camunda:inputParameter name="table">customer</camunda:inputParameter>
+          <camunda:inputParameter name="where">customer.pass_number = ${passport}</camunda:inputParameter>
+          <camunda:inputParameter name="url">jdbc:postgresql://localhost:5432/stub
+</camunda:inputParameter>
+          <camunda:inputParameter name="user">mms</camunda:inputParameter>
+          <camunda:inputParameter name="password">121</camunda:inputParameter>
+          <camunda:outputParameter name="stub">
+            <camunda:script scriptFormat="JavaScript">if (execution.getVariable("hasResult")){
+   execution.setVariable("isBankDelay", queryResult.get(0).get("debt"));
+   execution.setVariable("incomeBank", queryResult.get(0).get("salary"));
+   execution.setVariable("isBankStop", queryResult.get(0).get("stop_list"));
+} </camunda:script>
+          </camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_1girng6</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_09mv9tt</bpmn:outgoing>
+      <bpmn:property id="Property_07evjat" name="__targetRef_placeholder" />
+      <bpmn:dataInputAssociation id="DataInputAssociation_1pn12ex">
+        <bpmn:sourceRef>DataStoreReference_1pw2fo8</bpmn:sourceRef>
+        <bpmn:targetRef>Property_07evjat</bpmn:targetRef>
+      </bpmn:dataInputAssociation>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_0pztlfi" name="Клиент присутствует в базе?" default="SequenceFlow_1o15heu">
+      <bpmn:incoming>SequenceFlow_09mv9tt</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0hndo0b</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_1o15heu</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:businessRuleTask id="BusinessRuleTask_0svkqt1" name="Стратегия SC1" camunda:resultVariable="sc1Result" camunda:decisionRef="sc1" camunda:mapDecisionResult="singleResult">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:outputParameter name="decision">${sc1Result.get("decision")}</camunda:outputParameter>
+          <camunda:outputParameter name="needSC2">${sc1Result.get("needSC2")}</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_1966ios</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0jphxp7</bpmn:outgoing>
+    </bpmn:businessRuleTask>
+    <bpmn:endEvent id="EndEvent_0fvnitp">
+      <bpmn:incoming>SequenceFlow_1nxrcur</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_04khreh</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_1o15heu</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:businessRuleTask id="Task_11i8qzt" name="Стратегия SC2" camunda:resultVariable="sc2Result" camunda:decisionRef="sc2" camunda:mapDecisionResult="singleEntry">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:outputParameter name="decision">${sc2Result}</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_0hndo0b</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1nxrcur</bpmn:outgoing>
+    </bpmn:businessRuleTask>
+    <bpmn:startEvent id="StartEvent_0sv8dyd" name="Запрос из FRONT">
+      <bpmn:outgoing>SequenceFlow_14fdrv0</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="Task_15jmpdp" name="Запрос SOAP">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">https://demo2.reunico.com/axis2/services/B2B.B2BHttpSoap12Endpoint/</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="Content-type">application/soap+xml</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="payload">&lt;soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:re="http://reunico.com"&gt;
+   &lt;soap:Header/&gt;
+   &lt;soap:Body&gt;
+      &lt;re:getDelay&gt;
+         &lt;!--Optional:--&gt;
+         &lt;re:id&gt;${passport}&lt;/re:id&gt;
+      &lt;/re:getDelay&gt;
+   &lt;/soap:Body&gt;
+&lt;/soap:Envelope&gt;</camunda:inputParameter>
+            <camunda:outputParameter name="isDelay"> ${S(response)
+                    .childElement("Body")
+                    .childElement("http://reunico.com", "getDelayResponse")
+                    .childElement("return")
+                    .childElement("http://reunico.com/xsd", "delay")
+                    .textContent()}
+</camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>soap-http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_14fdrv0</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1966ios</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:dataStoreReference id="DataStoreReference_1pw2fo8" name="stub DB (customer)" />
+    <bpmn:sequenceFlow id="SequenceFlow_09mv9tt" sourceRef="Task_1ddvemc" targetRef="ExclusiveGateway_0pztlfi" />
+    <bpmn:sequenceFlow id="SequenceFlow_04khreh" name="Нет" sourceRef="ExclusiveGateway_0t2j6ir" targetRef="EndEvent_0fvnitp" />
+    <bpmn:sequenceFlow id="SequenceFlow_1girng6" name="Да" sourceRef="ExclusiveGateway_0t2j6ir" targetRef="Task_1ddvemc">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${needSC2}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_1nxrcur" sourceRef="Task_11i8qzt" targetRef="EndEvent_0fvnitp" />
+    <bpmn:sequenceFlow id="SequenceFlow_0jphxp7" sourceRef="BusinessRuleTask_0svkqt1" targetRef="ExclusiveGateway_0t2j6ir" />
+    <bpmn:sequenceFlow id="SequenceFlow_14fdrv0" sourceRef="StartEvent_0sv8dyd" targetRef="Task_15jmpdp" />
+    <bpmn:sequenceFlow id="SequenceFlow_0hndo0b" name="Да" sourceRef="ExclusiveGateway_0pztlfi" targetRef="Task_11i8qzt">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${hasResult}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_1o15heu" name="Нет" sourceRef="ExclusiveGateway_0pztlfi" targetRef="EndEvent_0fvnitp" />
+    <bpmn:sequenceFlow id="SequenceFlow_1966ios" sourceRef="Task_15jmpdp" targetRef="BusinessRuleTask_0svkqt1" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1cvv24w">
+      <bpmndi:BPMNShape id="Participant_1a7r1gf_di" bpmnElement="Participant_1a7r1gf">
+        <dc:Bounds x="167" y="269" width="1135" height="518" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_0t2j6ir_di" bpmnElement="ExclusiveGateway_0t2j6ir" isMarkerVisible="true">
+        <dc:Bounds x="673" y="482" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="665" y="452" width="67" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataStoreReference_1pw2fo8_di" bpmnElement="DataStoreReference_1pw2fo8" bioc:stroke="#1E88E5" bioc:fill="#BBDEFB">
+        <dc:Bounds x="889" y="346" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="887" y="312" width="53" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_1ghokku_di" bpmnElement="Task_1ddvemc" bioc:stroke="#43A047" bioc:fill="#C8E6C9">
+        <dc:Bounds x="805" y="467" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_0pztlfi_di" bpmnElement="ExclusiveGateway_0pztlfi" isMarkerVisible="true">
+        <dc:Bounds x="973" y="482" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="959" y="433" width="76" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BusinessRuleTask_0svkqt1_di" bpmnElement="BusinessRuleTask_0svkqt1" bioc:stroke="#FB8C00" bioc:fill="#FFE0B2">
+        <dc:Bounds x="510" y="467" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_0fvnitp_di" bpmnElement="EndEvent_0fvnitp" bioc:stroke="#43A047" bioc:fill="#C8E6C9">
+        <dc:Bounds x="1240" y="582" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BusinessRuleTask_0fl9a4f_di" bpmnElement="Task_11i8qzt" bioc:stroke="#FB8C00" bioc:fill="#FFE0B2">
+        <dc:Bounds x="1090" y="467" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_0sv8dyd_di" bpmnElement="StartEvent_0sv8dyd" bioc:stroke="#43A047" bioc:fill="#C8E6C9">
+        <dc:Bounds x="232" y="489" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="225" y="532" width="51" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_01fsez2_di" bpmnElement="Task_15jmpdp" bioc:stroke="#43A047" bioc:fill="#C8E6C9">
+        <dc:Bounds x="328" y="467" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_09mv9tt_di" bpmnElement="SequenceFlow_09mv9tt">
+        <di:waypoint x="905" y="507" />
+        <di:waypoint x="973" y="507" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_04khreh_di" bpmnElement="SequenceFlow_04khreh">
+        <di:waypoint x="698" y="532" />
+        <di:waypoint x="698" y="700" />
+        <di:waypoint x="1258" y="700" />
+        <di:waypoint x="1258" y="618" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="762" y="709" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1girng6_di" bpmnElement="SequenceFlow_1girng6">
+        <di:waypoint x="723" y="507" />
+        <di:waypoint x="805" y="507" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="743" y="481" width="14" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1nxrcur_di" bpmnElement="SequenceFlow_1nxrcur">
+        <di:waypoint x="1190" y="507" />
+        <di:waypoint x="1258" y="507" />
+        <di:waypoint x="1258" y="582" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0jphxp7_di" bpmnElement="SequenceFlow_0jphxp7">
+        <di:waypoint x="610" y="507" />
+        <di:waypoint x="673" y="507" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_14fdrv0_di" bpmnElement="SequenceFlow_14fdrv0">
+        <di:waypoint x="268" y="507" />
+        <di:waypoint x="328" y="507" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0hndo0b_di" bpmnElement="SequenceFlow_0hndo0b">
+        <di:waypoint x="1023" y="507" />
+        <di:waypoint x="1090" y="507" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1050" y="489" width="14" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1o15heu_di" bpmnElement="SequenceFlow_1o15heu">
+        <di:waypoint x="998" y="532" />
+        <di:waypoint x="998" y="600" />
+        <di:waypoint x="1240" y="600" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1004" y="563" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1966ios_di" bpmnElement="SequenceFlow_1966ios">
+        <di:waypoint x="428" y="507" />
+        <di:waypoint x="510" y="507" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataInputAssociation_1pn12ex_di" bpmnElement="DataInputAssociation_1pn12ex">
+        <di:waypoint x="903" y="396" />
+        <di:waypoint x="872" y="467" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Participant_1fpntt3_di" bpmnElement="Participant_1ce56i7" bioc:stroke="#1E88E5" bioc:fill="#BBDEFB">
+        <dc:Bounds x="212" y="25" width="393" height="164" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="MessageFlow_0wwkffc_di" bpmnElement="MessageFlow_0wwkffc">
+        <di:waypoint x="357" y="466" />
+        <di:waypoint x="357" y="190" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MessageFlow_07hvsjo_di" bpmnElement="MessageFlow_07hvsjo">
+        <di:waypoint x="405" y="189" />
+        <di:waypoint x="405" y="467" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

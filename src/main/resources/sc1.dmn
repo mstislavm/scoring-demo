@@ -1,0 +1,639 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd" xmlns:biodi="http://bpmn.io/schema/dmn/biodi/1.0" xmlns:camunda="http://camunda.org/schema/1.0/dmn" id="strategy1" name="strategy1" namespace="http://camunda.org/schema/1.0/dmn">
+  <decision id="ageStop" name="Возраст (Стоп-фактор)">
+    <extensionElements>
+      <biodi:bounds x="671" y="601" width="180" height="80" />
+    </extensionElements>
+    <decisionTable id="decisionTable_1">
+      <input id="InputClause_1ie1ogm" label="gender" camunda:inputVariable="gender">
+        <inputExpression id="LiteralExpression_1iwlg7i" typeRef="boolean">
+          <text>gender</text>
+        </inputExpression>
+      </input>
+      <input id="input_1" label="age" camunda:inputVariable="age">
+        <inputExpression id="inputExpression_1" typeRef="integer">
+          <text>age + period / 12</text>
+        </inputExpression>
+      </input>
+      <output id="output_1" label="ageStopResult" name="ageStopResult" typeRef="boolean" />
+      <rule id="DecisionRule_106bbam">
+        <description>Возраст + срок кредита &gt; 70 = отказ (М)</description>
+        <inputEntry id="UnaryTests_1q6uykj">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1alx2zr">
+          <text>&gt;70</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1uj536r">
+          <text>false</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_08y01bx">
+        <description>Возраст + срок кредииа &gt; 65 = отказ (Ж)</description>
+        <inputEntry id="UnaryTests_0i6j0e1">
+          <text>false</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0oavzzc">
+          <text>&gt;65</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_128jkv0">
+          <text>false</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1phcp9h">
+        <description>Возраст + срок кредита &lt;= 70 = далее (М)</description>
+        <inputEntry id="UnaryTests_14crq97">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_07fd9z2">
+          <text>&lt;=70</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0jue52i">
+          <text>true</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0t0ee7t">
+        <description>Возраст + срок кредита &lt;= 65 = далее (Ж)</description>
+        <inputEntry id="UnaryTests_0w4lgbc">
+          <text>false</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0dx2oc8">
+          <text>&lt;=65</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0lpvezu">
+          <text>true</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <decision id="debtStop" name="Долговая нагрузка (Стоп-фактор)">
+    <extensionElements>
+      <biodi:bounds x="466" y="602" width="180" height="80" />
+    </extensionElements>
+    <decisionTable id="DecisionTable_0yal6ia">
+      <input id="InputClause_0scaows" label="payment" camunda:inputVariable="payment">
+        <inputExpression id="LiteralExpression_1y16f38" typeRef="double">
+          <text>amount / period / income * 100</text>
+        </inputExpression>
+      </input>
+      <output id="OutputClause_1khukfu" label="debtStopResult" name="debtStopResult" typeRef="boolean" />
+      <rule id="DecisionRule_1a1nczy">
+        <description>Если ежемесячный платеж &gt; 50% дохода - отказ</description>
+        <inputEntry id="UnaryTests_054eprf">
+          <text>&gt;50</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0p0u89d">
+          <text>false</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1xp02vn">
+        <description>Если ежемесячный платеж &lt;= 50% дохода - далее</description>
+        <inputEntry id="UnaryTests_0iwjx2z">
+          <text>&lt;=50</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1hl5trs">
+          <text>true</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <decision id="isCustomer" name="Клиент банка и регион обслуживания (Стоп-фактор)">
+    <extensionElements>
+      <biodi:bounds x="785" y="501" width="180" height="80" />
+    </extensionElements>
+    <decisionTable id="DecisionTable_0nb5zoa" hitPolicy="FIRST">
+      <input id="InputClause_1v26iug" label="isCustomer" camunda:inputVariable="isCustomer">
+        <inputExpression id="LiteralExpression_0em75e4" typeRef="boolean">
+          <text>isCustomer</text>
+        </inputExpression>
+      </input>
+      <input id="InputClause_0kv8ewk" label="regionCode" camunda:inputVariable="regionCode">
+        <inputExpression id="LiteralExpression_189fueu" typeRef="string">
+          <text>regionCode</text>
+        </inputExpression>
+      </input>
+      <output id="OutputClause_01ewxi9" label="isCustomerResult" name="isCustomerResult" typeRef="boolean" />
+      <output id="OutputClause_08m2ubu" label="needSC2" name="needSC2" typeRef="boolean" />
+      <rule id="DecisionRule_1vl0v5i">
+        <description>Клиент - одобрение вне зависимости от региона</description>
+        <inputEntry id="UnaryTests_147gehx">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_14efyik">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_04zf5ns">
+          <text>true</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_1f60kai">
+          <text>true</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_10qcwcv">
+        <description>Не клиент, регион присутствия</description>
+        <inputEntry id="UnaryTests_0ze7thx">
+          <text>false</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1v3gdb8">
+          <text>"27"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0jatllp">
+          <text>true</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_0w1qn8m">
+          <text>false</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_11qbf0k">
+        <description>Не клиент, регион присутствия</description>
+        <inputEntry id="UnaryTests_0f91fqy">
+          <text>false</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0epreuo">
+          <text>"50"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_051tkq8">
+          <text>true</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_0ai19gu">
+          <text>false</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_05hou96">
+        <description>Не клиент, регион присутствия</description>
+        <inputEntry id="UnaryTests_0avq24k">
+          <text>false</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0phxx0k">
+          <text>"77"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_13pks8v">
+          <text>true</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_1mdoafk">
+          <text>false</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1fry121">
+        <description>Не клиент, банк не присутствует в регионе</description>
+        <inputEntry id="UnaryTests_06gxh4l">
+          <text>false</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0u79zil">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_017fh48">
+          <text>false</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_0or5bfn">
+          <text>false</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <decision id="isDelay" name="Наличие просрочки (БКИ)">
+    <extensionElements>
+      <biodi:bounds x="427" y="501" width="180" height="80" />
+    </extensionElements>
+    <decisionTable id="DecisionTable_1vsfmii">
+      <input id="InputClause_0fedc6n" label="isDelay" camunda:inputVariable="isDelay">
+        <inputExpression id="LiteralExpression_0g7375d" typeRef="boolean">
+          <text>isDelay</text>
+        </inputExpression>
+      </input>
+      <output id="OutputClause_093sshj" label="isDelayResult" name="isDelayResult" typeRef="boolean" />
+      <rule id="DecisionRule_0q20uvm">
+        <inputEntry id="UnaryTests_11mqmy2">
+          <text>true</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0lflxwx">
+          <text>false</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1rcd8ta">
+        <inputEntry id="UnaryTests_0j175he">
+          <text>false</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0859d8c">
+          <text>true</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <decision id="isOK" name="Наличие стоп-факторов">
+    <extensionElements>
+      <biodi:bounds x="641" y="344" width="180" height="80" />
+      <biodi:edge source="ageStop">
+        <biodi:waypoints x="774" y="599" />
+        <biodi:waypoints x="747" y="424" />
+      </biodi:edge>
+      <biodi:edge source="debtStop">
+        <biodi:waypoints x="622" y="602" />
+        <biodi:waypoints x="731" y="425" />
+      </biodi:edge>
+      <biodi:edge source="isDelay">
+        <biodi:waypoints x="572" y="501" />
+        <biodi:waypoints x="716" y="424" />
+      </biodi:edge>
+      <biodi:edge source="isCustomer">
+        <biodi:waypoints x="845" y="498" />
+        <biodi:waypoints x="771" y="424" />
+      </biodi:edge>
+    </extensionElements>
+    <variable id="InformationItem_15omj53" name="isOK" typeRef="boolean" />
+    <informationRequirement>
+      <requiredDecision href="#ageStop" />
+    </informationRequirement>
+    <informationRequirement>
+      <requiredDecision href="#debtStop" />
+    </informationRequirement>
+    <informationRequirement>
+      <requiredDecision href="#isDelay" />
+    </informationRequirement>
+    <informationRequirement>
+      <requiredDecision href="#isCustomer" />
+    </informationRequirement>
+    <literalExpression id="LiteralExpression_0o66faa" expressionLanguage="javascript">
+      <text>debtStopResult &amp;&amp; isDelayResult &amp;&amp; ageStopResult &amp;&amp; isCustomerResult</text>
+    </literalExpression>
+  </decision>
+  <decision id="ageScore" name="Возраст (скоринг)">
+    <extensionElements>
+      <biodi:bounds x="1003" y="500" width="180" height="80" />
+    </extensionElements>
+    <decisionTable id="DecisionTable_1dzl5h3">
+      <input id="InputClause_18r7gvw" label="age" camunda:inputVariable="age">
+        <inputExpression id="LiteralExpression_01hpxw1" typeRef="integer">
+          <text>age</text>
+        </inputExpression>
+      </input>
+      <output id="OutputClause_088v7eq" label="ageScore" name="ageScore" typeRef="double" />
+      <rule id="DecisionRule_0n8eqaf">
+        <inputEntry id="UnaryTests_12rbytf">
+          <text>&lt;25</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1eyannw">
+          <text>5.00</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0l3e21z">
+        <inputEntry id="UnaryTests_0z1nwr5">
+          <text>[25..35]</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0yl3q0s">
+          <text>17.00</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1cstd2z">
+        <inputEntry id="UnaryTests_1vdqlzx">
+          <text>[36..55]</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0012sgk">
+          <text>35.00</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1hkdmsc">
+        <inputEntry id="UnaryTests_1petwyr">
+          <text>&gt;55</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_08fjty2">
+          <text>10.00</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <decision id="propertyScore" name="Наличие имущества (скоринг)">
+    <extensionElements>
+      <biodi:bounds x="1145" y="611" width="180" height="80" />
+    </extensionElements>
+    <decisionTable id="DecisionTable_1gbsptd">
+      <input id="InputClause_1qdzrok" label="isProperty" camunda:inputVariable="isProperty">
+        <inputExpression id="LiteralExpression_0lqz1vd" typeRef="boolean">
+          <text>isProperty</text>
+        </inputExpression>
+      </input>
+      <output id="OutputClause_0vmi4ip" label="propertyScore" name="propertyScore" typeRef="double" />
+      <rule id="DecisionRule_1bf1q40">
+        <description>нет имущества</description>
+        <inputEntry id="UnaryTests_1at14se">
+          <text>false</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0h314ky">
+          <text>0</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1swog2g">
+        <description>есть имущество</description>
+        <inputEntry id="UnaryTests_02zf1fa">
+          <text>true</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_17oxutq">
+          <text>45.00</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <decision id="marriedScore" name="Семейное положение (скоринг)">
+    <extensionElements>
+      <biodi:bounds x="1305" y="492" width="180" height="80" />
+    </extensionElements>
+    <decisionTable id="DecisionTable_0380mif">
+      <input id="InputClause_1dea1fb" label="gender" camunda:inputVariable="gender">
+        <inputExpression id="LiteralExpression_1myqfg2" typeRef="boolean">
+          <text>gender</text>
+        </inputExpression>
+      </input>
+      <input id="InputClause_1mk8orb" label="isMarried" camunda:inputVariable="isMarried">
+        <inputExpression id="LiteralExpression_1bsg5ua" typeRef="boolean">
+          <text>isMarried</text>
+        </inputExpression>
+      </input>
+      <output id="OutputClause_16129qt" label="marriedScore" name="marriedScore" typeRef="double" />
+      <rule id="DecisionRule_1jiyk7x">
+        <inputEntry id="UnaryTests_0wkt47z">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1jdho6f">
+          <text>false</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_006uk5j">
+          <text>0</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0yhjt3j">
+        <inputEntry id="UnaryTests_1tpf0oh">
+          <text>false</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_06dnpl2">
+          <text>false</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0cgc9wk">
+          <text>3.00</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1f1eknm">
+        <inputEntry id="UnaryTests_1f0mbhc">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_031f9fd">
+          <text>true</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1y4fcaz">
+          <text>10.00</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0a2li1h">
+        <inputEntry id="UnaryTests_0ifbven">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0dto8fo">
+          <text>true</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0h7zyim">
+          <text>10.00</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <decision id="scoreResult" name="Баллы / Программа">
+    <extensionElements>
+      <biodi:bounds x="1144" y="341" width="180" height="80" />
+      <biodi:edge source="ageScore">
+        <biodi:waypoints x="1119" y="500" />
+        <biodi:waypoints x="1170" y="421" />
+      </biodi:edge>
+      <biodi:edge source="propertyScore">
+        <biodi:waypoints x="1234" y="611" />
+        <biodi:waypoints x="1231" y="421" />
+      </biodi:edge>
+      <biodi:edge source="marriedScore">
+        <biodi:waypoints x="1360" y="492" />
+        <biodi:waypoints x="1297" y="421" />
+      </biodi:edge>
+    </extensionElements>
+    <informationRequirement>
+      <requiredDecision href="#ageScore" />
+    </informationRequirement>
+    <informationRequirement>
+      <requiredDecision href="#propertyScore" />
+    </informationRequirement>
+    <informationRequirement>
+      <requiredDecision href="#marriedScore" />
+    </informationRequirement>
+    <decisionTable id="DecisionTable_1x5f8r8">
+      <input id="InputClause_1pnef9h" label="finalScore" camunda:inputVariable="finalScore">
+        <inputExpression id="LiteralExpression_1cw16ag" typeRef="double">
+          <text>ageScore + propertyScore + marriedScore</text>
+        </inputExpression>
+      </input>
+      <input id="InputClause_12vxk5u" label="loanType" camunda:inputVariable="loanType">
+        <inputExpression id="LiteralExpression_1tu4h74" typeRef="string">
+          <text>loanType</text>
+        </inputExpression>
+      </input>
+      <output id="OutputClause_1m8ztm0" label="scoreResult" name="scoreResult" typeRef="boolean" />
+      <output id="OutputClause_09hqlzb" label="finalScore" name="finalScore" typeRef="string" />
+      <rule id="DecisionRule_0fgdijf">
+        <inputEntry id="UnaryTests_0yx2ij9">
+          <text>&lt;15</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0afax2q">
+          <text>"Высокий риск"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1pxwa2r">
+          <text>false</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_19kt2ds">
+          <text>ageScore + propertyScore + marriedScore</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0hikvrl">
+        <inputEntry id="UnaryTests_1mkodnw">
+          <text>&gt;=15</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0jy8cum">
+          <text>"Высокий риск"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0pqoh4f">
+          <text>true</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_0ivte2f">
+          <text>ageScore + propertyScore + marriedScore</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1ezur2f">
+        <inputEntry id="UnaryTests_13jhi1y">
+          <text>&lt;25</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1jifmcn">
+          <text>"Средний риск"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_03tjhi7">
+          <text>false</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_1mtfrwx">
+          <text>ageScore + propertyScore + marriedScore</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1qk7ymo">
+        <inputEntry id="UnaryTests_1tqbfmm">
+          <text>&gt;=25</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0uo9e0s">
+          <text>"Cредний риск"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1xbpwdz">
+          <text>true</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_1jgzg57">
+          <text>ageScore + propertyScore + marriedScore</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0oqz4hw">
+        <inputEntry id="UnaryTests_0nxm7l5">
+          <text>&lt;50</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_09i48hk">
+          <text>"Низкий риск"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0hwjcyw">
+          <text>false</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_03q7kjx">
+          <text>ageScore + propertyScore + marriedScore</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_11l52xs">
+        <inputEntry id="UnaryTests_0mkke7r">
+          <text>&gt;=50</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1f8z6vf">
+          <text>"Низкий риск"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_14ybq0j">
+          <text>true</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_0xn9s02">
+          <text>ageScore + propertyScore + marriedScore</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <decision id="sc1" name="Принятие решения" camunda:versionTag="1">
+    <extensionElements>
+      <biodi:bounds x="858" y="156" width="180" height="80" />
+      <biodi:edge source="isOK">
+        <biodi:waypoints x="779" y="344" />
+        <biodi:waypoints x="909" y="236" />
+      </biodi:edge>
+      <biodi:edge source="scoreResult">
+        <biodi:waypoints x="1164" y="341" />
+        <biodi:waypoints x="979" y="236" />
+      </biodi:edge>
+      <biodi:edge source="isCustomer">
+        <biodi:waypoints x="883" y="501" />
+        <biodi:waypoints x="937" y="236" />
+      </biodi:edge>
+    </extensionElements>
+    <informationRequirement>
+      <requiredDecision href="#isOK" />
+    </informationRequirement>
+    <informationRequirement>
+      <requiredDecision href="#scoreResult" />
+    </informationRequirement>
+    <informationRequirement>
+      <requiredDecision href="#isCustomer" />
+    </informationRequirement>
+    <decisionTable id="DecisionTable_09xihsd">
+      <input id="InputClause_1lydj3e" label="result" camunda:inputVariable="result">
+        <inputExpression id="LiteralExpression_1s1vbno" typeRef="boolean">
+          <text>isOK and scoreResult</text>
+        </inputExpression>
+      </input>
+      <input id="InputClause_0cqa1pk" label="needSC2" camunda:inputVariable="needSC2">
+        <inputExpression id="LiteralExpression_19n4ud5" typeRef="boolean">
+          <text>needSC2</text>
+        </inputExpression>
+      </input>
+      <input id="InputClause_1ch2mhg">
+        <inputExpression id="LiteralExpression_1whjxhf" typeRef="string">
+          <text></text>
+        </inputExpression>
+      </input>
+      <output id="OutputClause_1p2559p" label="decision" name="decision" typeRef="boolean" />
+      <output id="OutputClause_0un9772" label="needSC2" name="needSC2" typeRef="boolean" />
+      <rule id="DecisionRule_1kdh6m9">
+        <description>Одобряем без необходимости SC2</description>
+        <inputEntry id="UnaryTests_1lwalzo">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0q5z17x">
+          <text>false</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_17kegp2">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0zlslo6">
+          <text>true</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_1fxwcuy">
+          <text>false</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0ujmf1s">
+        <description>Отказываем без необходимости SC2</description>
+        <inputEntry id="UnaryTests_01rdopa">
+          <text>false</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1bk42nu">
+          <text>false</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0czjlb5">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1nxb6gm">
+          <text>false</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_1h20fni">
+          <text>false</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0otsk76">
+        <description>Одобряем без необходимости SC2</description>
+        <inputEntry id="UnaryTests_082xues">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1v69l9m">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0b3u65w">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1h7sz3z">
+          <text>true</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_1njsg9e">
+          <text>false</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1onzf0m">
+        <description>Выполнить SC2</description>
+        <inputEntry id="UnaryTests_034zp8y">
+          <text>false</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0qc979y">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_14es0fo">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_065tsx7">
+          <text>false</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_1f3znn8">
+          <text>true</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>

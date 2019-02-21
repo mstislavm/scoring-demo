@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd" xmlns:biodi="http://bpmn.io/schema/dmn/biodi/1.0" xmlns:camunda="http://camunda.org/schema/1.0/dmn" id="strategy2" name="strategy2" namespace="http://camunda.org/schema/1.0/dmn">
+  <decision id="isStopBank" name="Присутствие в стоп-листе">
+    <extensionElements>
+      <biodi:bounds x="374" y="437" width="180" height="80" />
+    </extensionElements>
+    <decisionTable id="decisionTable_1">
+      <input id="input_1" label="isBankStop" camunda:inputVariable="isBankStop">
+        <inputExpression id="inputExpression_1" typeRef="boolean">
+          <text>isBankStop</text>
+        </inputExpression>
+      </input>
+      <output id="output_1" label="stopResult" name="stopResult" typeRef="boolean" />
+      <rule id="DecisionRule_1ezdgu3">
+        <inputEntry id="UnaryTests_0zgn19j">
+          <text>true</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1y6ivja">
+          <text>false</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0geojxw">
+        <inputEntry id="UnaryTests_0b47n9v">
+          <text>false</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0allv1m">
+          <text>true</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <decision id="isDelayBank" name="Имеется просрочка">
+    <extensionElements>
+      <biodi:bounds x="522" y="570" width="180" height="80" />
+    </extensionElements>
+    <decisionTable id="DecisionTable_0e0bwuh">
+      <input id="InputClause_0db0o0s" label="isBankDelay" camunda:inputVariable="isBankDelay">
+        <inputExpression id="LiteralExpression_13b0nql" typeRef="boolean">
+          <text>isBankDelay</text>
+        </inputExpression>
+      </input>
+      <output id="OutputClause_0vz70qq" label="delayResult" name="delayResult" typeRef="boolean" />
+      <rule id="DecisionRule_1w5mqur">
+        <inputEntry id="UnaryTests_1jb6tkl">
+          <text>true</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0yp5ooi">
+          <text>false</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0fl6a0p">
+        <inputEntry id="UnaryTests_1y9sled">
+          <text>false</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1d43kh7">
+          <text>true</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <decision id="isBankDebt" name="Долговая нагрузка">
+    <extensionElements>
+      <biodi:bounds x="709" y="440" width="180" height="80" />
+    </extensionElements>
+    <decisionTable id="DecisionTable_1swvxp3">
+      <input id="InputClause_0f5cntr" label="payment" camunda:inputVariable="payment">
+        <inputExpression id="LiteralExpression_1d7705x" typeRef="double">
+          <text>amount / period / incomeBank * 100</text>
+        </inputExpression>
+      </input>
+      <output id="OutputClause_0xiuwsj" label="debtResult" name="debtResult" typeRef="boolean" />
+      <rule id="DecisionRule_0hf77u2">
+        <description>Если ежемесячный платеж &gt; 50% дохода - отказ</description>
+        <inputEntry id="UnaryTests_03v0kup">
+          <text>&gt;50</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_07hszhc">
+          <text>false</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0oblm4w">
+        <description>Если ежемесячный платеж &lt;= 50% дохода - далее</description>
+        <inputEntry id="UnaryTests_1bhlhva">
+          <text>&lt;=50</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0u3e52p">
+          <text>true</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <decision id="sc2" name="Принятие решения">
+    <extensionElements>
+      <biodi:bounds x="524" y="267" width="180" height="80" />
+      <biodi:edge source="isStopBank">
+        <biodi:waypoints x="493" y="437" />
+        <biodi:waypoints x="559" y="347" />
+      </biodi:edge>
+      <biodi:edge source="isDelayBank">
+        <biodi:waypoints x="612" y="570" />
+        <biodi:waypoints x="611" y="347" />
+      </biodi:edge>
+      <biodi:edge source="isBankDebt">
+        <biodi:waypoints x="761" y="440" />
+        <biodi:waypoints x="672" y="347" />
+      </biodi:edge>
+    </extensionElements>
+    <variable id="InformationItem_0wc1pea" name="desicion" typeRef="boolean" />
+    <informationRequirement>
+      <requiredDecision href="#isStopBank" />
+    </informationRequirement>
+    <informationRequirement>
+      <requiredDecision href="#isDelayBank" />
+    </informationRequirement>
+    <informationRequirement>
+      <requiredDecision href="#isBankDebt" />
+    </informationRequirement>
+    <literalExpression id="LiteralExpression_0gwm2rd" expressionLanguage="javascript">
+      <text>stopResult &amp;&amp; delayResult &amp;&amp; debtResult</text>
+    </literalExpression>
+  </decision>
+</definitions>
