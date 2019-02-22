@@ -384,7 +384,7 @@
       </rule>
       <rule id="DecisionRule_0a2li1h">
         <inputEntry id="UnaryTests_0ifbven">
-          <text>true</text>
+          <text>false</text>
         </inputEntry>
         <inputEntry id="UnaryTests_0dto8fo">
           <text>true</text>
@@ -480,7 +480,7 @@
           <text>&gt;=25</text>
         </inputEntry>
         <inputEntry id="UnaryTests_0uo9e0s">
-          <text>"Cредний риск"</text>
+          <text>"Средний риск"</text>
         </inputEntry>
         <outputEntry id="LiteralExpression_1xbpwdz">
           <text>true</text>
@@ -555,11 +555,6 @@
           <text>needSC2</text>
         </inputExpression>
       </input>
-      <input id="InputClause_1ch2mhg">
-        <inputExpression id="LiteralExpression_1whjxhf" typeRef="string">
-          <text></text>
-        </inputExpression>
-      </input>
       <output id="OutputClause_1p2559p" label="decision" name="decision" typeRef="boolean" />
       <output id="OutputClause_0un9772" label="needSC2" name="needSC2" typeRef="boolean" />
       <rule id="DecisionRule_1kdh6m9">
@@ -569,9 +564,6 @@
         </inputEntry>
         <inputEntry id="UnaryTests_0q5z17x">
           <text>false</text>
-        </inputEntry>
-        <inputEntry id="UnaryTests_17kegp2">
-          <text></text>
         </inputEntry>
         <outputEntry id="LiteralExpression_0zlslo6">
           <text>true</text>
@@ -588,9 +580,6 @@
         <inputEntry id="UnaryTests_1bk42nu">
           <text>false</text>
         </inputEntry>
-        <inputEntry id="UnaryTests_0czjlb5">
-          <text></text>
-        </inputEntry>
         <outputEntry id="LiteralExpression_1nxb6gm">
           <text>false</text>
         </outputEntry>
@@ -606,9 +595,6 @@
         <inputEntry id="UnaryTests_1v69l9m">
           <text>true</text>
         </inputEntry>
-        <inputEntry id="UnaryTests_0b3u65w">
-          <text></text>
-        </inputEntry>
         <outputEntry id="LiteralExpression_1h7sz3z">
           <text>true</text>
         </outputEntry>
@@ -623,9 +609,6 @@
         </inputEntry>
         <inputEntry id="UnaryTests_0qc979y">
           <text>true</text>
-        </inputEntry>
-        <inputEntry id="UnaryTests_14es0fo">
-          <text></text>
         </inputEntry>
         <outputEntry id="LiteralExpression_065tsx7">
           <text>false</text>
